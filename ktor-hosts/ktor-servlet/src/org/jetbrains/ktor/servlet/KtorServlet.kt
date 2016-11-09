@@ -11,6 +11,9 @@ import javax.servlet.http.*
 abstract class KtorServlet : HttpServlet() {
 
     abstract val application: Application
+    open val pool: ByteBufferPool
+        get() = NoPool
+
     protected val hostPipeline = defaultHostPipeline()
 
     override fun service(request: HttpServletRequest, response: HttpServletResponse) {
@@ -23,7 +26,7 @@ abstract class KtorServlet : HttpServlet() {
 
         try {
             request.startAsync()
-            val call = ServletApplicationCall(application, request, response, NoPool, { call, block, next ->
+            val call = ServletApplicationCall(application, request, response, pool, { call, block, next ->
                 tryPush(request, call, block, next)
             })
 
